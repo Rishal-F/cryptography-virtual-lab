@@ -124,6 +124,8 @@ function initializeDictionaryAttackUI() {
   }
 
   let targetHash = '';
+  let hashGenerationRequestId = 0;
+  let hashGenerationInProgress = false;
   let attackRunning = false;
   let attackRunId = 0;
 
@@ -136,7 +138,8 @@ function initializeDictionaryAttackUI() {
   }
 
   function setButtonsForAttackState() {
-    startAttackButton.disabled = attackRunning;
+    startAttackButton.disabled =
+      attackRunning || hashGenerationInProgress || !isValidTargetHash(targetHash);
     generateHashButton.disabled = attackRunning;
   }
 
@@ -154,26 +157,41 @@ function initializeDictionaryAttackUI() {
       return;
     }
 
+    const currentRequestId = ++hashGenerationRequestId;
+    hashGenerationInProgress = true;
+    setButtonsForAttackState();
     const password = targetPasswordInput.value;
     if (!password) {
       targetHash = '';
+      hashGenerationInProgress = false;
       targetHashOutput.textContent = 'Enter a target password before generating a hash.';
       attackStatus.textContent = 'Validation error';
       attackResult.textContent = '';
+      setButtonsForAttackState();
       return;
     }
 
     try {
-      targetHash = await sha256Hash(password);
+      const generatedTargetHash = await sha256Hash(password);
+      if (currentRequestId !== hashGenerationRequestId) {
+        return;
+      }
+      targetHash = generatedTargetHash;
+      hashGenerationInProgress = false;
       targetHashOutput.textContent = targetHash;
       clearAttackOutput();
       attackStatus.textContent = 'Target hash generated. Ready to start the attack.';
-      startAttackButton.disabled = false;
+      setButtonsForAttackState();
     } catch (error) {
+      if (currentRequestId !== hashGenerationRequestId) {
+        return;
+      }
       targetHash = '';
+      hashGenerationInProgress = false;
       targetHashOutput.textContent = 'Unable to generate the target hash.';
       attackStatus.textContent = 'Error';
       attackResult.textContent = 'The Web Crypto API could not generate the target hash.';
+      setButtonsForAttackState();
       console.error('Target hash generation failed:', error);
     }
   }
@@ -204,6 +222,9 @@ function initializeDictionaryAttackUI() {
 
         const candidate = CANDIDATE_PASSWORDS[index];
         const candidateHash = await sha256Hash(candidate);
+        if (!attackRunning || currentRunId !== attackRunId) {
+          return;
+        }
         const matched = candidateHash === targetHash.toLowerCase();
         const attempts = index + 1;
 
@@ -213,8 +234,7 @@ function initializeDictionaryAttackUI() {
         addAttackLogEntry(attempts, candidate, candidateHash, matched);
 
         if (matched) {
-          attackProgress.value = 100;
-          attackStatus.textContent = 'Password Found';
+          attackStatus.textContent = 'Attack Complete: Password Found';
           attackResult.textContent = `A matching candidate was found after ${attempts} attempt${attempts === 1 ? '' : 's'}.`;
           attackRunning = false;
           setButtonsForAttackState();
@@ -225,7 +245,7 @@ function initializeDictionaryAttackUI() {
       }
 
       attackProgress.value = 100;
-      attackStatus.textContent = 'Password Not Found';
+      attackStatus.textContent = 'Attack Complete: Password Not Found';
       attackResult.textContent =
         `The target password was not present in the predefined dictionary. ` +
         `${CANDIDATE_PASSWORDS.length} attempts were made.`;
@@ -243,6 +263,8 @@ function initializeDictionaryAttackUI() {
 
   function resetAttack() {
     attackRunId += 1;
+    hashGenerationRequestId += 1;
+    hashGenerationInProgress = false;
     attackRunning = false;
     targetHash = '';
     targetPasswordInput.value = '';
@@ -252,6 +274,15 @@ function initializeDictionaryAttackUI() {
     setButtonsForAttackState();
   }
 
+  targetPasswordInput.addEventListener('input', () => {
+    hashGenerationRequestId += 1;
+    hashGenerationInProgress = false;
+    targetHash = '';
+    targetHashOutput.textContent = 'No target hash generated.';
+    attackStatus.textContent = 'Target hash required';
+    attackResult.textContent = '';
+    setButtonsForAttackState();
+  });
   generateHashButton.addEventListener('click', generateTargetHash);
   startAttackButton.addEventListener('click', startAttack);
   resetAttackButton.addEventListener('click', resetAttack);

@@ -29,6 +29,8 @@
         <button class="tab-btn" type="button" data-tab="procedure" aria-selected="false">Procedure</button>
         <button class="tab-btn" type="button" data-tab="simulation" aria-selected="false">Simulation</button>
         <button class="tab-btn" type="button" data-tab="quiz" aria-selected="false">Quiz</button>
+        <button class="tab-btn" type="button" data-tab="references" aria-selected="false">References</button>
+        <button class="tab-btn" type="button" data-tab="feedback" aria-selected="false">Feedback</button>
       </nav>
 
       <main class="content-area">
@@ -178,6 +180,97 @@
               <button id="retry-quiz" type="button">Retry Quiz</button>
             </div>
             <div id="quiz-result" class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="references" class="tab-content references-panel" data-tab-panel="references" hidden>
+          <h2>References &amp; Further Reading</h2>
+          <div class="reference-list">
+            <article class="reference-card">
+              <h3>William Stallings — Cryptography and Network Security: Principles and Practice</h3>
+              <p>Authoritative textbook covering mathematical foundations, cryptographic primitives, hash algorithms, and security architecture.</p>
+              <p>Pearson Education.</p>
+            </article>
+            <article class="reference-card">
+              <h3>NIST Special Publication (SP) 800 Series</h3>
+              <p>National Institute of Standards and Technology Computer Security Division publications, recommendations, and cryptographic standard guidelines.</p>
+            </article>
+            <article class="reference-card">
+              <h3>IETF RFC Specifications &amp; Standards</h3>
+              <p>Internet Engineering Task Force request for comments, algorithm specifications, and protocol compliance benchmarks.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="feedback" class="tab-content feedback-panel" data-tab-panel="feedback" hidden>
+          <div class="feedback-container">
+            <div class="feedback-heading">
+              <span class="encryption-badge">🔒 End-to-End Encrypted</span>
+              <h2>Feedback for Dictionary Attack</h2>
+              <p>Please share your feedback regarding this experiment simulation. This is a UI preview only; encryption and feedback submission are not implemented.</p>
+            </div>
+
+            <div class="feedback-form">
+              <div class="feedback-grid">
+                <div class="feedback-field">
+                  <label for="feedback-name">Full Name *</label>
+                  <input id="feedback-name" name="feedback-name" type="text" placeholder="Enter your full name">
+                </div>
+                <div class="feedback-field">
+                  <label for="feedback-student-id">Roll No / Student ID *</label>
+                  <input id="feedback-student-id" name="feedback-student-id" type="text" placeholder="Enter roll number or student ID">
+                </div>
+              </div>
+
+              <fieldset class="rating-field">
+                <legend>Overall Experiment Rating *</legend>
+                <div class="rating-stars" role="radiogroup" aria-label="Overall Experiment Rating">
+                  <input id="rating-1" name="experiment-rating" type="radio" value="1">
+                  <label for="rating-1" aria-label="1 star">★</label>
+                  <input id="rating-2" name="experiment-rating" type="radio" value="2">
+                  <label for="rating-2" aria-label="2 stars">★</label>
+                  <input id="rating-3" name="experiment-rating" type="radio" value="3">
+                  <label for="rating-3" aria-label="3 stars">★</label>
+                  <input id="rating-4" name="experiment-rating" type="radio" value="4">
+                  <label for="rating-4" aria-label="4 stars">★</label>
+                  <input id="rating-5" name="experiment-rating" type="radio" value="5">
+                  <label for="rating-5" aria-label="5 stars">★</label>
+                </div>
+                <p class="rating-hint">Select rating</p>
+              </fieldset>
+
+              <div class="feedback-grid">
+                <div class="feedback-field">
+                  <label for="concept-clarity">Concept Clarity</label>
+                  <select id="concept-clarity" name="concept-clarity">
+                    <option>1 - Not Clear</option>
+                    <option>2 - Needs Improvement</option>
+                    <option>3 - Satisfactory</option>
+                    <option selected>4 - Clear &amp; Easy to Follow</option>
+                    <option>5 - Excellent</option>
+                  </select>
+                </div>
+                <div class="feedback-field">
+                  <label for="simulation-ease">Simulation Ease of Use</label>
+                  <select id="simulation-ease" name="simulation-ease">
+                    <option>1 - Very Difficult</option>
+                    <option>2 - Difficult</option>
+                    <option>3 - Average</option>
+                    <option selected>4 - Easy to Operate</option>
+                    <option>5 - Very Easy</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="feedback-field feedback-comments">
+                <label for="feedback-comments">Comments, Observations &amp; Suggestions *</label>
+                <textarea id="feedback-comments" name="feedback-comments" rows="5" placeholder="What did you learn from this simulation? Any suggestions for improvement?"></textarea>
+              </div>
+
+              <div class="feedback-actions">
+                <button class="feedback-submit" type="button">Encrypt &amp; Submit Feedback</button>
+              </div>
+            </div>
           </div>
         </section>
       </main>
