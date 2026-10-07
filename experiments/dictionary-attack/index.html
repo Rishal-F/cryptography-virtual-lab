@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Virtual Cryptography Laboratory experiment">
-    <title>Experiment | Virtual Cryptography Laboratory</title>
+    <title>Dictionary Attack | Virtual Cryptography Laboratory</title>
     <link rel="stylesheet" href="../../css/variables.css">
     <link rel="stylesheet" href="../../css/experiment.css">
   </head>
@@ -20,8 +20,8 @@
       <header class="exp-header">
         <a class="back-link" href="../../index.html#experiments">&larr; Back to experiment browser</a>
         <p class="exp-kicker">CSS TH ISE &middot; Cryptographic Security Systems</p>
-        <h1 id="exp-title">Experiment Title</h1>
-        <p id="exp-description">Brief description</p>
+        <h1 id="exp-title">Dictionary Attack</h1>
+        <p id="exp-description">Simulate a dictionary attack by testing a predefined set of candidate passwords against a stored SHA-256 password hash.</p>
       </header>
 
       <nav class="tab-navigation" aria-label="Experiment sections">
@@ -33,39 +33,151 @@
 
       <main class="content-area">
         <section id="theory" class="tab-content active" data-tab-panel="theory">
-          <!-- Group fills this section with theory and algorithm details. -->
-          <div class="content-placeholder">
-            <h2>Theory</h2>
-            <p>Add the experiment background, terminology, and algorithm explanation here.</p>
-          </div>
+          <h2>Theory</h2>
+          <h3>What is a dictionary attack?</h3>
+          <p>
+            A dictionary attack is a password-guessing technique that tests a
+            prepared list of likely passwords against a protected password
+            representation. Unlike a brute-force attack, which generates every
+            possible combination, a dictionary attack focuses on words and
+            patterns that people commonly choose.
+          </p>
+
+          <h3>Targeting password hashes</h3>
+          <p>
+            Systems should store password hashes rather than plaintext
+            passwords. A hash is a one-way representation that makes it
+            difficult to recover the original password directly. If an
+            attacker obtains a stored hash, however, they can hash guessed
+            passwords and compare the results with the stolen value.
+          </p>
+
+          <h3>Dictionary and SHA-256 comparison</h3>
+          <p>
+            This simulation uses a predefined dictionary of commonly used
+            passwords. Each candidate password is processed by the SHA-256
+            cryptographic hash function. The resulting hash is compared with
+            the target hash stored by the system. Because the same input
+            produces the same SHA-256 output, an equal hash indicates that the
+            candidate matches the password represented by the target hash.
+          </p>
+          <p>
+            The attack stops as soon as a matching hash is found, avoiding
+            unnecessary tests after success. If none of the dictionary
+            candidates produces the target hash, the attack fails for this
+            dictionary. This does not prove that the password is secure; it
+            means only that the password was not found among the candidates
+            tested.
+          </p>
+
+          <h3>Algorithm</h3>
+          <ol>
+            <li>Obtain the target SHA-256 password hash.</li>
+            <li>Read the candidate passwords in dictionary order.</li>
+            <li>Hash the current candidate with SHA-256.</li>
+            <li>Compare the candidate hash with the target hash.</li>
+            <li>If the hashes match, report the candidate and stop the attack.</li>
+            <li>If the dictionary is exhausted without a match, report failure.</li>
+          </ol>
         </section>
 
         <section id="procedure" class="tab-content" data-tab-panel="procedure" hidden>
-          <!-- Group fills this section with numbered procedure steps. -->
-          <div class="content-placeholder">
-            <h2>Procedure</h2>
-            <p>Add the guided steps learners will follow here.</p>
-          </div>
+          <h2>Procedure</h2>
+          <ol>
+            <li>Open the <strong>Simulation</strong> tab.</li>
+            <li>Enter or select a target password for the experiment.</li>
+            <li>Generate or use its stored SHA-256 hash.</li>
+            <li>Start the dictionary attack.</li>
+            <li>Observe each candidate password as it is tested.</li>
+            <li>Observe the generated hash and its comparison result.</li>
+            <li>Observe the attack stopping when a matching hash is found.</li>
+            <li>
+              Observe the failure result when the password is not present in
+              the dictionary.
+            </li>
+            <li>Reset the simulation to perform another experiment.</li>
+          </ol>
         </section>
 
         <section id="simulation" class="tab-content" data-tab-panel="simulation" hidden>
           <div class="simulation-controls">
-            <!-- Group adds experiment-specific input fields and buttons here. -->
             <h2>Simulation controls</h2>
-            <p>Add inputs and controls for the experiment simulation.</p>
+            <div class="form-group">
+              <label for="target-password">Target password</label>
+              <input id="target-password" name="target-password" type="password" autocomplete="off">
+            </div>
+            <button id="generate-hash" type="button">Generate Target Hash</button>
+            <div class="form-group">
+              <label for="target-hash">Target SHA-256 hash</label>
+              <output id="target-hash" class="hash-display" aria-live="polite">No target hash generated.</output>
+            </div>
+            <div class="simulation-actions">
+              <button id="start-attack" type="button">Start Attack</button>
+              <button id="reset-attack" type="button">Reset</button>
+            </div>
           </div>
           <div class="simulation-output" aria-live="polite">
-            <!-- Group adds result displays here. -->
             <h2>Simulation output</h2>
-            <p>Results will appear here after the simulation runs.</p>
+            <p id="attack-status">Ready to begin the dictionary attack.</p>
+            <p>Current candidate: <strong id="current-candidate">None</strong></p>
+            <p>Attempts: <strong id="attempt-count">0</strong></p>
+            <label for="attack-progress">Attack progress</label>
+            <progress id="attack-progress" value="0" max="100">0%</progress>
+            <h3>Attack log</h3>
+            <div id="attack-log" class="attack-log" role="log" aria-live="polite">
+              <p>No candidates tested yet.</p>
+            </div>
+            <p id="attack-result" class="attack-result"></p>
           </div>
         </section>
 
         <section id="quiz" class="tab-content" data-tab-panel="quiz" hidden>
-          <!-- Group adds quiz questions and answer controls here. -->
           <div class="quiz-panel">
             <h2>Knowledge check</h2>
-            <p>Add experiment-specific quiz questions here.</p>
+            <fieldset data-correct-answer="b">
+              <legend>1. What is a dictionary attack?</legend>
+              <label><input type="radio" name="quiz-1" value="a"> Testing every possible character combination</label>
+              <label><input type="radio" name="quiz-1" value="b"> Testing passwords from a prepared list of likely candidates</label>
+              <label><input type="radio" name="quiz-1" value="c"> Encrypting a password with multiple keys</label>
+              <label><input type="radio" name="quiz-1" value="d"> Deleting a stored password hash</label>
+            </fieldset>
+
+            <fieldset data-correct-answer="c">
+              <legend>2. Why is each candidate password hashed before comparison?</legend>
+              <label><input type="radio" name="quiz-2" value="a"> Hashing makes the candidate longer</label>
+              <label><input type="radio" name="quiz-2" value="b"> Hashing sorts candidates alphabetically</label>
+              <label><input type="radio" name="quiz-2" value="c"> The stored password is represented by a hash, not plaintext</label>
+              <label><input type="radio" name="quiz-2" value="d"> Hashing guarantees that every candidate will match</label>
+            </fieldset>
+
+            <fieldset data-correct-answer="a">
+              <legend>3. What happens when a candidate hash matches the target hash?</legend>
+              <label><input type="radio" name="quiz-3" value="a"> The matching candidate is reported and the attack stops</label>
+              <label><input type="radio" name="quiz-3" value="b"> The dictionary is automatically expanded</label>
+              <label><input type="radio" name="quiz-3" value="c"> The target hash is changed</label>
+              <label><input type="radio" name="quiz-3" value="d"> All candidates must still be tested</label>
+            </fieldset>
+
+            <fieldset data-correct-answer="d">
+              <legend>4. When does a dictionary attack fail?</legend>
+              <label><input type="radio" name="quiz-4" value="a"> When SHA-256 is used</label>
+              <label><input type="radio" name="quiz-4" value="b"> When the first candidate is tested</label>
+              <label><input type="radio" name="quiz-4" value="c"> When a candidate hash is generated</label>
+              <label><input type="radio" name="quiz-4" value="d"> When no dictionary candidate produces the target hash</label>
+            </fieldset>
+
+            <fieldset data-correct-answer="b">
+              <legend>5. Why can a larger or better dictionary improve attack coverage?</legend>
+              <label><input type="radio" name="quiz-5" value="a"> It makes SHA-256 reversible</label>
+              <label><input type="radio" name="quiz-5" value="b"> It includes more likely passwords and patterns to test</label>
+              <label><input type="radio" name="quiz-5" value="c"> It removes the need to compare hashes</label>
+              <label><input type="radio" name="quiz-5" value="d"> It guarantees that every password will be found</label>
+            </fieldset>
+            <div class="quiz-actions">
+              <button id="submit-quiz" type="button">Submit Quiz</button>
+              <button id="retry-quiz" type="button">Retry Quiz</button>
+            </div>
+            <div id="quiz-result" class="quiz-result" aria-live="polite"></div>
           </div>
         </section>
       </main>
